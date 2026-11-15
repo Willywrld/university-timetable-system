@@ -1,1 +1,0 @@
-# university-timetable-system
