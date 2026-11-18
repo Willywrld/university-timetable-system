@@ -1,0 +1,94 @@
+<%- include('partials/header') %>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <p class="text-muted small mb-0">University of Ibadan Distance Learning Centre &mdash; timetable overview</p>
+  </div>
+  <div class="d-print-none">
+    <a class="btn btn-outline-primary btn-sm" href="/timetables">View timetable</a>
+    <% if (currentUser.role !== 'viewer') { %>
+      <a class="btn btn-primary btn-sm" href="/timetables/generate">Generate timetable</a>
+    <% } %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <% const cards = [
+    ['Courses', stats.courses],
+    ['Venues', stats.venues],
+    ['Facilitators', stats.facilitators],
+    ['Scheduled activities', stats.assignments],
+    ['Open conflicts', stats.openConflicts],
+    ['Unassigned requests', stats.unscheduled]
+  ]; %>
+  <% cards.forEach(function (card) { %>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card stat-card h-100 shadow-sm">
+        <div class="card-body py-3">
+          <div class="stat-value"><%= card[1] %></div>
+          <div class="text-muted small"><%= card[0] %></div>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Recent generation runs</span>
+        <a class="small" href="/timetables/setup">Setup</a>
+      </div>
+      <div class="card-body p-0">
+        <% if (!runs.length) { %>
+          <p class="text-muted p-3 mb-0">No generation runs yet.</p>
+        <% } else { %>
+          <table class="table table-sm mb-0">
+            <thead>
+              <tr><th>#</th><th>Category</th><th>Period</th><th>Assigned</th><th>Unassigned</th><th>Conflicts</th></tr>
+            </thead>
+            <tbody>
+              <% runs.forEach(function (run) { %>
+                <tr>
+                  <td><%= run.id %></td>
+                  <td><%= run.type_name %></td>
+                  <td class="small"><%= run.date_from %> &ndash; <%= run.date_to %></td>
+                  <td><%= run.assigned_count %></td>
+                  <td><%= run.unassigned_count %></td>
+                  <td><%= run.conflict_count %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Open conflicts</span>
+        <a class="small" href="/conflicts">Full report</a>
+      </div>
+      <div class="card-body p-0">
+        <% if (!conflicts.length) { %>
+          <p class="text-muted p-3 mb-0">No open conflicts.</p>
+        <% } else { %>
+          <ul class="list-group list-group-flush">
+            <% conflicts.forEach(function (conflict) { %>
+              <li class="list-group-item">
+                <span class="badge <%= conflict.severity === 'hard' ? 'badge-severity-hard' : 'badge-severity-warning' %>"><%= conflict.conflict_type %></span>
+                <div class="small mt-1"><%= conflict.message %></div>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+
+<h1 class="h3 mb-1">User Management</h1>
+<p class="text-muted small mb-3">Only administrators can create accounts or change roles.</p>
+
+<% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header">Add user</div>
+      <div class="card-body">
+        <form method="post" action="/users" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username <span class="text-danger">*</span></label>
+            <input class="form-control" id="username" name="username" required>
+            <div class="invalid-feedback">Username is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="full_name">Full name <span class="text-danger">*</span></label>
+            <input class="form-control" id="full_name" name="full_name" required>
+            <div class="invalid-feedback">Full name is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" id="email" name="email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="role">Role <span class="text-danger">*</span></label>
+            <select class="form-select" id="role" name="role" required>
+              <option value="">-- select --</option>
+              <% roles.forEach(function (role) { %><option value="<%= role %>"><%= role %></option><% }); %>
+            </select>
+            <div class="invalid-feedback">Role is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password <span class="text-danger">*</span></label>
+            <input class="form-control" type="password" id="password" name="password" minlength="8" required>
+            <div class="form-text">At least 8 characters.</div>
+            <div class="invalid-feedback">Password must be at least 8 characters.</div>
+          </div>
+          <button class="btn btn-primary" type="submit">Create user</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr><th>Username</th><th>Name</th><th>Role</th><th>Active</th><th>Update</th></tr>
+          </thead>
+          <tbody>
+            <% users.forEach(function (user) { %>
+              <tr>
+                <td><%= user.username %></td>
+                <td><%= user.full_name %><div class="small text-muted"><%= user.email || '' %></div></td>
+                <td colspan="3">
+                  <form method="post" action="/users/<%= user.id %>/update" class="row g-2 align-items-center">
+                    <div class="col-5">
+                      <select class="form-select form-select-sm" name="role">
+                        <% roles.forEach(function (role) { %>
+                          <option value="<%= role %>" <%= user.role === role ? 'selected' : '' %>><%= role %></option>
+                        <% }); %>
+                      </select>
+                    </div>
+                    <div class="col-2">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="active" value="1" id="active-<%= user.id %>" <%= user.active ? 'checked' : '' %>>
+                        <label class="form-check-label small" for="active-<%= user.id %>">Active</label>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <input class="form-control form-control-sm" type="password" name="password" placeholder="New password" minlength="8">
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

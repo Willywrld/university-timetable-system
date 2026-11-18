@@ -1,0 +1,181 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0"><%= title %></h1>
+    <p class="text-muted small mb-0">Saving runs a full conflict detection pass and shows the result immediately.</p>
+  </div>
+  <div class="d-print-none">
+    <a class="btn btn-outline-secondary btn-sm" href="/timetables">Back to timetable</a>
+  </div>
+</div>
+
+<% if (errors && errors.length) { %>
+  <div class="alert alert-danger">
+    <strong>The activity was not saved:</strong>
+    <ul class="mb-0">
+      <% errors.forEach(function (error) { %><li><%= error %></li><% }); %>
+    </ul>
+  </div>
+<% } %>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header">Activity details</div>
+      <div class="card-body">
+        <form method="post" action="<%= formAction %>" class="needs-validation" novalidate>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="timetable_type_id">Category <span class="text-danger">*</span></label>
+              <select class="form-select" id="timetable_type_id" name="timetable_type_id" required>
+                <option value="">-- select --</option>
+                <% reference.types.forEach(function (type) { %>
+                  <option value="<%= type.id %>" <%= String(values.timetable_type_id) === String(type.id) ? 'selected' : '' %>><%= type.name %></option>
+                <% }); %>
+              </select>
+              <div class="invalid-feedback">Category is required.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="course_id">Course <span class="text-danger">*</span></label>
+              <select class="form-select" id="course_id" name="course_id" required>
+                <option value="">-- select --</option>
+                <% reference.courses.forEach(function (course) { %>
+                  <option value="<%= course.id %>" <%= String(values.course_id) === String(course.id) ? 'selected' : '' %>><%= course.course_code %> &ndash; <%= course.course_title %></option>
+                <% }); %>
+              </select>
+              <div class="invalid-feedback">Course is required.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="facilitator_id">Facilitator</label>
+              <select class="form-select" id="facilitator_id" name="facilitator_id">
+                <option value="">-- none --</option>
+                <% reference.facilitators.forEach(function (facilitator) { %>
+                  <option value="<%= facilitator.id %>" <%= String(values.facilitator_id) === String(facilitator.id) ? 'selected' : '' %>><%= facilitator.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="student_group_id">Student group</label>
+              <select class="form-select" id="student_group_id" name="student_group_id">
+                <option value="">-- none --</option>
+                <% reference.groups.forEach(function (group) { %>
+                  <option value="<%= group.id %>" <%= String(values.student_group_id) === String(group.id) ? 'selected' : '' %>><%= group.name %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="date">Date <span class="text-danger">*</span></label>
+              <input class="form-control" type="date" id="date" name="date" value="<%= values.date %>" required>
+              <div class="invalid-feedback">Date is required.</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="start_time">Start time <span class="text-danger">*</span></label>
+              <input class="form-control" type="time" id="start_time" name="start_time" value="<%= values.start_time %>" required>
+              <div class="invalid-feedback">Start time is required.</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="end_time">End time <span class="text-danger">*</span></label>
+              <input class="form-control" type="time" id="end_time" name="end_time" value="<%= values.end_time %>" required>
+              <div class="invalid-feedback">End time must be after start time.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="venue_id">Venue (physical / examination)</label>
+              <select class="form-select" id="venue_id" name="venue_id">
+                <option value="">-- none --</option>
+                <% reference.venues.forEach(function (venue) { %>
+                  <option value="<%= venue.id %>" <%= String(values.venue_id) === String(venue.id) ? 'selected' : '' %>><%= venue.name %> (<%= venue.centre %>, cap. <%= venue.capacity %>)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="platform_id">Platform (virtual)</label>
+              <select class="form-select" id="platform_id" name="platform_id">
+                <option value="">-- none --</option>
+                <% reference.platforms.forEach(function (platform) { %>
+                  <option value="<%= platform.id %>" <%= String(values.platform_id) === String(platform.id) ? 'selected' : '' %>><%= platform.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="centre">Examination centre</label>
+              <input class="form-control" id="centre" name="centre" value="<%= values.centre %>" placeholder="e.g. Ibadan">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="expected_candidates">Expected candidates</label>
+              <input class="form-control" type="number" min="0" id="expected_candidates" name="expected_candidates" value="<%= values.expected_candidates %>">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="exam_format">Exam format</label>
+              <select class="form-select" id="exam_format" name="exam_format">
+                <option value="">-- not an examination --</option>
+                <option value="CBT" <%= values.exam_format === 'CBT' ? 'selected' : '' %>>CBT</option>
+                <option value="written" <%= values.exam_format === 'written' ? 'selected' : '' %>>Written</option>
+                <option value="practical" <%= values.exam_format === 'practical' ? 'selected' : '' %>>Practical</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="status">Status</label>
+              <select class="form-select" id="status" name="status">
+                <option value="scheduled" <%= values.status === 'scheduled' ? 'selected' : '' %>>Scheduled</option>
+                <option value="unscheduled" <%= values.status === 'unscheduled' ? 'selected' : '' %>>Unscheduled request</option>
+              </select>
+              <div class="form-text">Unscheduled requests are picked up by the generator.</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Save and re-check conflicts</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header">Conflicts for this activity</div>
+      <div class="card-body p-0">
+        <% if (!conflicts.length) { %>
+          <p class="text-muted p-3 mb-0">No open conflict involves this activity.</p>
+        <% } else { %>
+          <ul class="list-group list-group-flush">
+            <% conflicts.forEach(function (conflict) { %>
+              <li class="list-group-item">
+                <span class="badge <%= conflict.severity === 'hard' ? 'badge-severity-hard' : 'badge-severity-warning' %>"><%= conflict.conflict_type %></span>
+                <div class="small mt-1"><%= conflict.message %></div>
+                <div class="small text-muted">Suggested fix: <%= conflict.suggested_fix %></div>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+      <div class="card-header">Hard constraints enforced</div>
+      <div class="card-body small">
+        <ul class="mb-0 ps-3">
+          <li>Venue double booking</li>
+          <li>Facilitator double booking</li>
+          <li>Student group clash</li>
+          <li>End time after start time</li>
+          <li>Venue for physical, platform for virtual, venue + format + centre for examinations</li>
+          <li>Venue capacity against expected candidates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

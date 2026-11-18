@@ -1,0 +1,38 @@
+{
+  "name": "university-timetable-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "University Timetable Scheduling System - A Case Study of the University of Ibadan Distance Learning Centre (final-year project MVP)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:init": "node src/db/init.js",
+    "db:seed": "node src/db/seed.js",
+    "db:reset": "node src/db/reset.js",
+    "test": "jest --runInBand",
+    "test:unit": "jest tests/unit.test.js --runInBand",
+    "test:api": "jest tests/api.test.js --runInBand"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^12.11.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  }
+}

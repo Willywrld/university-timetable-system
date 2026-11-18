@@ -1,0 +1,85 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0">Generation result &mdash; <%= result.type.name %></h1>
+    <p class="text-muted small mb-0">
+      Run #<%= result.runId %> &middot; <%= dateFrom %> to <%= dateTo %> &middot;
+      <%= result.assigned.length %> assigned, <%= result.unassigned.length %> unassigned, <%= result.conflictCount %> open conflict(s)
+    </p>
+  </div>
+  <div class="d-print-none">
+    <a class="btn btn-outline-secondary btn-sm" href="/timetables?category=<%= result.type.code %>&date_from=<%= dateFrom %>&date_to=<%= dateTo %>">View timetable</a>
+    <a class="btn btn-outline-danger btn-sm" href="/conflicts">Conflict report</a>
+    <a class="btn btn-primary btn-sm" href="/timetables/generate?category=<%= result.type.code %>">Generate again</a>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header">Assigned activities (<%= result.assigned.length %>)</div>
+  <div class="card-body table-responsive">
+    <table class="table table-sm table-striped mb-0 align-middle">
+      <thead><tr><th>Date</th><th>Time</th><th>Course</th><th>Group</th><th>Venue</th><th>Platform</th><th>Candidates</th></tr></thead>
+      <tbody>
+        <% if (!result.assigned.length) { %>
+          <tr><td colspan="7" class="text-muted">No activity could be assigned.</td></tr>
+        <% } %>
+        <% result.assigned.forEach(function (row) { %>
+          <tr>
+            <td><%= row.date %></td>
+            <td><%= row.start_time %>&ndash;<%= row.end_time %></td>
+            <td><strong><%= row.course_code %></strong> <span class="text-muted small"><%= row.course_title %></span></td>
+            <td><%= row.group_name || '-' %></td>
+            <td><%= row.venue_name || '-' %></td>
+            <td><%= row.platform_name || '-' %></td>
+            <td><%= row.expected_candidates || '-' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header">Unassigned activities (<%= result.unassigned.length %>)</div>
+  <div class="card-body table-responsive">
+    <table class="table table-sm mb-0 align-middle">
+      <thead><tr><th>Course</th><th>Group</th><th>Candidates</th><th>Reason</th></tr></thead>
+      <tbody>
+        <% if (!result.unassigned.length) { %>
+          <tr><td colspan="4" class="text-muted">Every activity was assigned.</td></tr>
+        <% } %>
+        <% result.unassigned.forEach(function (row) { %>
+          <tr>
+            <td><strong><%= row.course_code %></strong> <span class="text-muted small"><%= row.course_title %></span></td>
+            <td><%= row.group_name || '-' %></td>
+            <td><%= row.expected_candidates || '-' %></td>
+            <td class="text-danger small"><%= row.reason %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header">Conflicts detected after generation (<%= result.conflictCount %>)</div>
+  <div class="card-body p-0">
+    <% if (!result.conflicts.length) { %>
+      <p class="text-muted p-3 mb-0">No conflicts were detected.</p>
+    <% } else { %>
+      <ul class="list-group list-group-flush">
+        <% result.conflicts.forEach(function (conflict) { %>
+          <li class="list-group-item">
+            <span class="badge <%= conflict.severity === 'hard' ? 'badge-severity-hard' : 'badge-severity-warning' %>"><%= conflict.conflictType %></span>
+            <span class="badge bg-light text-dark">assignments <%= conflict.assignmentIds.join(', ') %></span>
+            <div class="small mt-1"><%= conflict.message %></div>
+            <div class="small text-muted">Suggested fix: <%= conflict.suggestedFix %></div>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

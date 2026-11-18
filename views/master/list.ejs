@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0"><%= cfg.title %></h1>
+    <p class="text-muted small mb-0"><%= rows.length %> record(s). Add, edit or remove master data here.</p>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="/dashboard">Dashboard</a>
+</div>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header"><%= editRow ? 'Edit ' + cfg.singular : 'Add ' + cfg.singular %></div>
+      <div class="card-body">
+        <form method="post" action="<%= formAction %>" class="needs-validation" novalidate>
+          <% cfg.fields.forEach(function (field) { %>
+            <div class="mb-3">
+              <label class="form-label" for="field-<%= field.name %>">
+                <%= field.label %><% if (field.required) { %> <span class="text-danger">*</span><% } %>
+              </label>
+
+              <% if (field.type === 'select') { %>
+                <select class="form-select" id="field-<%= field.name %>" name="<%= field.name %>" <%= field.required ? 'required' : '' %>>
+                  <option value="">-- select --</option>
+                  <% (fieldOptions[field.name] || []).forEach(function (option) { %>
+                    <option value="<%= option.id %>" <%= String(values[field.name]) === String(option.id) ? 'selected' : '' %>><%= option.label %></option>
+                  <% }); %>
+                </select>
+                <div class="invalid-feedback"><%= field.label %> is required.</div>
+              <% } else if (field.type === 'checkbox') { %>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="field-<%= field.name %>" name="<%= field.name %>" value="1" <%= values[field.name] ? 'checked' : '' %>>
+                  <label class="form-check-label" for="field-<%= field.name %>">Yes</label>
+                </div>
+              <% } else { %>
+                <input class="form-control"
+                       type="<%= field.type === 'number' ? 'number' : field.type %>"
+                       id="field-<%= field.name %>"
+                       name="<%= field.name %>"
+                       value="<%= values[field.name] === null || values[field.name] === undefined ? '' : values[field.name] %>"
+                       <%= field.required ? 'required' : '' %>>
+                <div class="invalid-feedback"><%= field.label %> is required.</div>
+              <% } %>
+
+              <% if (field.hint) { %><div class="form-text"><%= field.hint %></div><% } %>
+            </div>
+          <% }); %>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit"><%= editRow ? 'Save changes' : 'Add' %></button>
+            <% if (editRow) { %><a class="btn btn-outline-secondary" href="<%= basePath %>">Cancel</a><% } %>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body table-responsive">
+        <table class="table table-sm table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <% cfg.columns.forEach(function (column) { %><th><%= column.label %></th><% }); %>
+              <th class="text-end d-print-none">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!rows.length) { %>
+              <tr><td colspan="<%= cfg.columns.length + 1 %>" class="text-muted">No records yet.</td></tr>
+            <% } %>
+            <% rows.forEach(function (row) { %>
+              <tr>
+                <% cfg.columns.forEach(function (column) { %>
+                  <td>
+                    <% if (column.type === 'bool') { %>
+                      <%= row[column.key] ? 'Yes' : 'No' %>
+                    <% } else { %>
+                      <%= row[column.key] === null || row[column.key] === undefined ? '' : row[column.key] %>
+                    <% } %>
+                  </td>
+                <% }); %>
+                <td class="text-end d-print-none">
+                  <a class="btn btn-sm btn-outline-primary" href="<%= basePath %>?edit=<%= row.id %>">Edit</a>
+                  <form method="post" action="<%= basePath %>/<%= row.id %>/delete" class="d-inline" onsubmit="return confirm('Delete this <%= cfg.singular %>?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

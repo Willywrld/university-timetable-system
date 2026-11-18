@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-1">Sign in</h1>
+        <p class="text-muted small mb-4">University Timetable Scheduling System &mdash; UIDLC</p>
+
+        <% if (error) { %>
+          <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
+        <form method="post" action="/login" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" id="username" name="username" value="<%= username %>" required autofocus>
+            <div class="invalid-feedback">Username is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" type="password" id="password" name="password" required>
+            <div class="invalid-feedback">Password is required.</div>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">Log in</button>
+        </form>
+
+        <% if (process.env.NODE_ENV !== 'production') { %>
+          <hr>
+          <p class="small text-muted mb-1">Development demo accounts (see README.md):</p>
+          <ul class="small text-muted mb-0">
+            <li>admin / Admin@1234 &mdash; full administration</li>
+            <li>officer / Officer@1234 &mdash; timetable generation and adjustment</li>
+            <li>viewer / Viewer@1234 &mdash; read-only timetable viewing</li>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

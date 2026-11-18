@@ -1,0 +1,63 @@
+body {
+  background-color: #f5f7fa;
+}
+
+.stat-card {
+  border-left: 4px solid #0d6efd;
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.table-sm th,
+.table-sm td {
+  vertical-align: middle;
+}
+
+.badge-severity-hard {
+  background-color: #dc3545;
+}
+
+.badge-severity-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+@media print {
+  .navbar,
+  .d-print-none,
+  .btn,
+  .alert {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff;
+    font-size: 12px;
+  }
+
+  main.container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .card {
+    border: 0;
+    box-shadow: none !important;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  a[href]:after {
+    content: '';
+  }
+}

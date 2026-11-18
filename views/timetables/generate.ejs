@@ -1,0 +1,113 @@
+<%- include('../partials/header') %>
+
+<h1 class="h3 mb-1">Generate Timetable</h1>
+<p class="text-muted small mb-3">
+  The rule-based greedy algorithm schedules unscheduled activities for one category at a time and then runs a full conflict check.
+</p>
+
+<% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header">Generation options</div>
+      <div class="card-body">
+        <form method="post" action="/timetables/generate" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="timetable_type_id">Timetable category <span class="text-danger">*</span></label>
+            <select class="form-select" id="timetable_type_id" name="timetable_type_id" required>
+              <option value="">-- select --</option>
+              <% reference.types.forEach(function (type) { %>
+                <option value="<%= type.id %>" <%= String(form.timetable_type_id) === String(type.id) ? 'selected' : '' %>><%= type.name %></option>
+              <% }); %>
+            </select>
+            <div class="invalid-feedback">Choose a timetable category.</div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="date_from">From date <span class="text-danger">*</span></label>
+              <input class="form-control" type="date" id="date_from" name="date_from" value="<%= form.date_from %>" required>
+              <div class="form-text">Time slots exist between <%= bounds.min_date || 'n/a' %> and <%= bounds.max_date || 'n/a' %>.</div>
+              <div class="invalid-feedback">Start date is required.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="date_to">To date <span class="text-danger">*</span></label>
+              <input class="form-control" type="date" id="date_to" name="date_to" value="<%= form.date_to %>" required>
+              <div class="invalid-feedback">End date is required.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="programme_id">Programme (optional)</label>
+              <select class="form-select" id="programme_id" name="programme_id">
+                <option value="">All programmes</option>
+                <% reference.programmes.forEach(function (programme) { %>
+                  <option value="<%= programme.id %>" <%= String(form.programme_id) === String(programme.id) ? 'selected' : '' %>><%= programme.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="level_id">Level (optional)</label>
+              <select class="form-select" id="level_id" name="level_id">
+                <option value="">All levels</option>
+                <% reference.levels.forEach(function (level) { %>
+                  <option value="<%= level.id %>" <%= String(form.level_id) === String(level.id) ? 'selected' : '' %>><%= level.level_number %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="course_id">Course (optional)</label>
+              <select class="form-select" id="course_id" name="course_id">
+                <option value="">All courses</option>
+                <% reference.courses.forEach(function (course) { %>
+                  <option value="<%= course.id %>" <%= String(form.course_id) === String(course.id) ? 'selected' : '' %>><%= course.course_code %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <fieldset class="border rounded p-3 mb-3">
+            <legend class="float-none w-auto px-2 fs-6">Soft constraint toggles</legend>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="avoidEarly" name="avoidEarly" value="1" <%= form.avoidEarly ? 'checked' : '' %>>
+              <label class="form-check-label" for="avoidEarly">Avoid very early slots (before 09:00) where possible</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="avoidLate" name="avoidLate" value="1" <%= form.avoidLate ? 'checked' : '' %>>
+              <label class="form-check-label" for="avoidLate">Avoid late slots (after 17:00) where possible</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="balanceWorkload" name="balanceWorkload" value="1" <%= form.balanceWorkload ? 'checked' : '' %>>
+              <label class="form-check-label" for="balanceWorkload">Balance facilitator workload across slots</label>
+            </div>
+            <div class="form-text">These only change the order in which candidate slots are tried. Hard constraints are always enforced.</div>
+          </fieldset>
+
+          <button class="btn btn-primary" type="submit">Generate</button>
+          <a class="btn btn-outline-secondary" href="/timetables/setup">Timetable setup</a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header">How the algorithm works</div>
+      <div class="card-body small">
+        <ol class="mb-0 ps-3">
+          <li>Validate the request and load the category.</li>
+          <li>Fetch unscheduled activities for that category.</li>
+          <li>Sort them most-constrained first (examinations with many candidates, then GES and long activities).</li>
+          <li>Try time slots in a fixed order, then venues/platforms.</li>
+          <li>Assign the first combination that breaks no hard constraint.</li>
+          <li>Mark the rest as unassigned with a reason.</li>
+          <li>Run full conflict detection on the saved timetable.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
